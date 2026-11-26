@@ -105,7 +105,7 @@ export default function Header() {
 
                     <a href="#" className="header-logo" aria-label="Aviorr Home">
                         <Image
-                            src="/assets/aviorr.png"
+                            src="/assets/aviorr1.png"
                             alt="Aviorr"
                             width={180}
                             height={54}
@@ -232,7 +232,12 @@ export default function Header() {
                                     className="mega-menu-card"
                                     onClick={() => setMenuOpen(false)}
                                 >
-                                    <img src={item.image} alt={item.name} />
+                                    <img
+                                        src={item.image}
+                                        alt={item.name}
+                                        loading="lazy"
+                                        decoding="async"
+                                    />
                                     <span className="mega-menu-card-label">{item.name}</span>
                                 </a>
                             ))}
