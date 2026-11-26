@@ -23,6 +23,14 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en" className={`${cormorant.variable} ${jakarta.variable}`}>
+      <head>
+        <link
+          rel="preload"
+          as="video"
+          href="/assets/hero-vide.mp4"
+          type="video/mp4"
+        />
+      </head>
       <body>{children}</body>
     </html>
   );

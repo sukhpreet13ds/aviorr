@@ -269,6 +269,7 @@ export default function Home() {
           muted
           loop
           playsInline
+          preload="auto"
         />
         <div className={`hero-dark-layer ${isScrolled ? "is-active" : ""}`} />
       </div>
@@ -293,15 +294,6 @@ export default function Home() {
               Discover more
             </a>
           </div>
-
-          <button
-            type="button"
-            className="mobile-slider-arrow next"
-            aria-label="Next product"
-            onClick={() => scrollProducts(1)}
-          >
-            <FiChevronRight size={24} />
-          </button>
         </section>
 
         {/* Next 100vh: Products Section in front of stopped, darkened video */}
