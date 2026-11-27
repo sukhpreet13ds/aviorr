@@ -38,12 +38,12 @@ const FEATURED_ITEMS = [
 ];
 
 const MENU_LINKS = [
-    "Aviorr Products & Accessories",
-    "Craftsmanship",
-    "The Aviorr Story",
-    "About Aviorr",
-    "Collections",
-    "Buying & Servicing",
+    { label: "Aviorr Products & Accessories", href: "/all-products" },
+    { label: "Craftsmanship", href: "/about-us" },
+    { label: "The Aviorr Story", href: "/about-us" },
+    { label: "About Aviorr", href: "/about-us" },
+    { label: "Collections", href: "/all-products" },
+    { label: "Buying & Servicing", href: "/customer-services" },
 ];
 
 export default function Header() {
@@ -231,15 +231,15 @@ export default function Header() {
                                         All Products
                                     </Link>
                                 </li>
-                                {MENU_LINKS.map((label) => (
-                                    <li key={label}>
-                                        <a
-                                            href="#products"
+                                {MENU_LINKS.map((item) => (
+                                    <li key={item.label}>
+                                        <Link
+                                            href={item.href}
                                             className="mega-menu-link"
                                             onClick={() => setMenuOpen(false)}
                                         >
-                                            {label}
-                                        </a>
+                                            {item.label}
+                                        </Link>
                                     </li>
                                 ))}
                             </ul>
