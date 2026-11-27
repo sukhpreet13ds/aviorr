@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import {
     FiMenu,
     FiSearch,
@@ -10,6 +11,8 @@ import {
     FiX,
     FiGlobe,
 } from "react-icons/fi";
+import { useCart } from "@/context/CartContext";
+import { PRODUCTS_CATALOG, formatINR } from "@/data/products";
 
 const FEATURED_ITEMS = [
     {
@@ -45,29 +48,53 @@ const MENU_LINKS = [
 
 export default function Header() {
     const [menuOpen, setMenuOpen] = useState(false);
+    const [searchOpen, setSearchOpen] = useState(false);
+    const [searchQuery, setSearchQuery] = useState("");
     const [lang, setLang] = useState("EN");
+    const searchInputRef = useRef(null);
+    const { setCartOpen, totalCount } = useCart();
+
+    const filteredProducts = PRODUCTS_CATALOG.filter((item) => {
+        const q = searchQuery.trim().toLowerCase();
+        if (!q) return true;
+        return (
+            item.name.toLowerCase().includes(q) ||
+            item.notes.toLowerCase().includes(q) ||
+            item.description.toLowerCase().includes(q)
+        );
+    });
 
     useEffect(() => {
         const onKeyDown = (e) => {
-            if (e.key === "Escape") setMenuOpen(false);
+            if (e.key === "Escape") {
+                setMenuOpen(false);
+                setSearchOpen(false);
+            }
         };
         window.addEventListener("keydown", onKeyDown);
         return () => window.removeEventListener("keydown", onKeyDown);
     }, []);
 
     useEffect(() => {
-        const value = menuOpen ? "hidden" : "";
+        const locked = menuOpen || searchOpen;
+        const value = locked ? "hidden" : "";
         document.documentElement.style.overflow = value;
         document.body.style.overflow = value;
         return () => {
             document.documentElement.style.overflow = "";
             document.body.style.overflow = "";
         };
-    }, [menuOpen]);
+    }, [menuOpen, searchOpen]);
+
+    useEffect(() => {
+        if (searchOpen) {
+            setTimeout(() => searchInputRef.current?.focus(), 80);
+        }
+    }, [searchOpen]);
 
     return (
         <>
-            <a href="#products" className="top-marquee-bar" aria-label="Black Friday Sale">
+            <Link href="/offers" className="top-marquee-bar" aria-label="Black Friday Sale">
                 <div className="top-marquee-track">
                     <span>Black Friday Sale is LIVE! Grab the Deals Before 30 Nov</span>
                     <span>Black Friday Sale is LIVE! Grab the Deals Before 30 Nov</span>
@@ -78,7 +105,7 @@ export default function Header() {
                     <span>Black Friday Sale is LIVE! Grab the Deals Before 30 Nov</span>
                     <span>Black Friday Sale is LIVE! Grab the Deals Before 30 Nov</span>
                 </div>
-            </a>
+            </Link>
 
             <header className="site-header">
                 <div className="header-inner">
@@ -98,12 +125,13 @@ export default function Header() {
                             type="button"
                             className="header-action header-search-mobile"
                             aria-label="Search"
+                            onClick={() => setSearchOpen(true)}
                         >
                             <FiSearch size={17} />
                         </button>
                     </div>
 
-                    <a href="#" className="header-logo" aria-label="Aviorr Home">
+                    <a href="/" className="header-logo" aria-label="Aviorr Home">
                         <Image
                             src="/assets/aviorr1.png"
                             alt="Aviorr"
@@ -119,6 +147,7 @@ export default function Header() {
                             type="button"
                             className="header-action header-search-desktop"
                             aria-label="Search"
+                            onClick={() => setSearchOpen(true)}
                         >
                             <FiSearch size={17} />
                             <span className="header-action-text">Search</span>
@@ -143,19 +172,25 @@ export default function Header() {
                             </button>
                         </div>
 
-                        <button type="button" className="header-action" aria-label="Cart">
-                            <FiShoppingBag size={17} />
-                            <span className="header-action-text">Cart</span>
-                        </button>
-
                         <button
                             type="button"
+                            className="header-action header-cart-btn"
+                            aria-label="Cart"
+                            onClick={() => setCartOpen(true)}
+                        >
+                            <FiShoppingBag size={17} />
+                            <span className="header-action-text">Cart</span>
+                            {totalCount > 0 && <span className="cart-badge-count">{totalCount}</span>}
+                        </button>
+
+                        <Link
+                            href="/login"
                             className="header-action header-login-btn"
                             aria-label="Login"
                         >
                             <FiUser size={16} />
                             <span className="header-action-text">Login</span>
-                        </button>
+                        </Link>
                     </nav>
                 </div>
             </header>
@@ -178,6 +213,24 @@ export default function Header() {
                         <div className="mega-menu-top">
                             <p className="mega-menu-eyebrow">Featured</p>
                             <ul className="mega-menu-list">
+                                <li>
+                                    <Link
+                                        href="/offers"
+                                        className="mega-menu-link mega-menu-offers-shine"
+                                        onClick={() => setMenuOpen(false)}
+                                    >
+                                        Offers
+                                    </Link>
+                                </li>
+                                 <li>
+                                    <Link
+                                        href="/all-products"
+                                        className="mega-menu-link"
+                                        onClick={() => setMenuOpen(false)}
+                                    >
+                                        All Products
+                                    </Link>
+                                </li>
                                 {MENU_LINKS.map((label) => (
                                     <li key={label}>
                                         <a
@@ -252,6 +305,76 @@ export default function Header() {
                     >
                         <FiX size={20} />
                     </button>
+                </div>
+            </div>
+
+            {/* Search Overlay */}
+            <div
+                className={`search-overlay-backdrop ${searchOpen ? "is-open" : ""}`}
+                onClick={() => setSearchOpen(false)}
+                aria-hidden={!searchOpen}
+            >
+                <div
+                    className={`search-overlay-modal ${searchOpen ? "is-open" : ""}`}
+                    onClick={(e) => e.stopPropagation()}
+                    role="dialog"
+                    aria-modal="true"
+                    aria-label="Search Products"
+                >
+                    <div className="search-input-row">
+                        <FiSearch size={19} className="search-input-icon" />
+                        <input
+                            ref={searchInputRef}
+                            type="text"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            placeholder="Search perfumes, notes, collections..."
+                            aria-label="Search perfumes"
+                        />
+                        <button
+                            type="button"
+                            className="search-close-btn"
+                            aria-label="Close search"
+                            onClick={() => setSearchOpen(false)}
+                        >
+                            <FiX size={18} />
+                        </button>
+                    </div>
+
+                    <div className="search-suggestions">
+                        <p className="search-suggestions-label">
+                            {searchQuery.trim() ? "Suggested Products" : "Popular Fragrances"}
+                        </p>
+
+                        {filteredProducts.length === 0 ? (
+                            <p className="search-empty">No products found matching &ldquo;{searchQuery}&rdquo;.</p>
+                        ) : (
+                            <div className="search-suggestions-list">
+                                {filteredProducts.map((item) => (
+                                    <Link
+                                        key={item.id}
+                                        href={`/products/${item.slug}`}
+                                        className="search-suggestion-item"
+                                        onClick={() => setSearchOpen(false)}
+                                    >
+                                        <img
+                                            src={item.image}
+                                            alt={item.name}
+                                            className="search-suggestion-img"
+                                        />
+                                        <div className="search-suggestion-meta">
+                                            <h4>{item.name}</h4>
+                                            <p>{item.notes}</p>
+                                        </div>
+                                        <div className="search-suggestion-price">
+                                            <span>{formatINR(item.price)}</span>
+                                            <small>{formatINR(item.originalPrice)}</small>
+                                        </div>
+                                    </Link>
+                                ))}
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
         </>

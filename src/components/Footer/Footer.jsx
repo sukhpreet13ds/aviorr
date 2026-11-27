@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { FiArrowRight, FiFacebook, FiInstagram, FiYoutube } from "react-icons/fi";
 
 export default function Footer() {
@@ -17,13 +18,13 @@ export default function Footer() {
           />
           <div className="footer-socials">
             <a href="#" aria-label="Facebook">
-              <FiFacebook size={18} />
+              <FiFacebook size={28} />
             </a>
             <a href="#" aria-label="Instagram">
-              <FiInstagram size={18} />
+              <FiInstagram size={28} />
             </a>
             <a href="#" aria-label="YouTube">
-              <FiYoutube size={18} />
+              <FiYoutube size={28} />
             </a>
           </div>
         </div>
@@ -32,9 +33,9 @@ export default function Footer() {
           <div>
             <h4>Company Info</h4>
             <ul>
-              <li><a href="#">About Us</a></li>
-              <li><a href="#">Careers</a></li>
-              <li><a href="#">Blogs</a></li>
+              <li><Link href="/about-us">About Us</Link></li>
+              <li><Link href="/all-products">Products</Link></li>
+              
             </ul>
           </div>
 
@@ -53,12 +54,11 @@ export default function Footer() {
           <h4>Support</h4>
           <ul>
             <li><a href="#">FAQs</a></li>
-            <li><a href="#">Track Order</a></li>
-            <li><a href="#">Store Locator</a></li>
-            <li><a href="#">Customer Services</a></li>
-            <li><a href="#">Privacy Policy</a></li>
-            <li><a href="#">Shipping Policy</a></li>
-            <li><a href="#">Return and Refund Policy</a></li>
+            <li><Link href="/customer-services">Customer Services</Link></li>
+            <li><Link href="/privacy-policy">Privacy Policy</Link></li>
+            <li><Link href="/terms-conditions">Terms Conditions</Link></li>
+            <li><Link href="/shipping-policy">Shipping Policy</Link></li>
+            <li><Link href="/return-refund-policy">Return and Refund Policy</Link></li>
           </ul>
         </div>
 
@@ -80,8 +80,8 @@ export default function Footer() {
         </div>
       </div>
 
-      <div className="footer-bottom">
-        <p>© 2026 Aviorr. All rights reserved.</p>
+      <div className="footer-bottom" >
+        <p>© 2026 Aviorr. All rights reserved. </p> <p>Designed & Developed by <a href="https://skullsolution.com" target="_blank" style={{color: "#DFA080"}}>Skull Solution</a></p>
       </div>
     </footer>
   );

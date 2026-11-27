@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import {
   FiArrowRight,
   FiArrowUpRight,
@@ -13,6 +14,8 @@ import {
 } from "react-icons/fi";
 import Header from "@/components/Header/Header";
 import Footer from "@/components/Footer/Footer";
+import { PRODUCTS_CATALOG, formatINR } from "@/data/products";
+import { useCart } from "@/context/CartContext";
 
 const PRODUCTS = [
   {
@@ -166,6 +169,7 @@ export default function Home() {
   const bestSellersRef = useRef(null);
   const scentsRef = useRef(null);
   const [isScrolled, setIsScrolled] = useState(false);
+  const { addToCart, setCartOpen } = useCart();
   const [scentsCanPrev, setScentsCanPrev] = useState(false);
   const [scentsCanNext, setScentsCanNext] = useState(true);
 
@@ -339,10 +343,13 @@ export default function Home() {
                 <div className="product-hover-curtain-top" aria-hidden="true" />
                 <div className="product-hover-curtain-bottom" aria-hidden="true" />
 
-                <a href="#products" className="product-shop-btn">
+                <Link
+                  href={`/products/${PRODUCTS_CATALOG[idx]?.slug || ""}`}
+                  className="product-shop-btn"
+                >
                   <span>Shop</span>
                   <FiArrowUpRight className="product-shop-arrow" />
-                </a>
+                </Link>
               </div>
             ))}
           </div>
@@ -371,7 +378,7 @@ export default function Home() {
 
         {/* White Background Auto-Sliding Showcase */}
         <section className="white-slider-section">
-          <div className="white-slider-container">
+          <Link href="/offers" className="white-slider-container" aria-label="View Offers">
             {SLIDES.map((slide, idx) => (
               <img
                 key={slide.src}
@@ -405,7 +412,7 @@ export default function Home() {
                 </button>
               ))}
             </div>
-          </div>
+          </Link>
         </section>
 
         {/* Explore Scents */}
@@ -464,7 +471,8 @@ export default function Home() {
         </section>
 
         {/* Our Best Sellers */}
-        <section className="light-section best-sellers-section">
+        <div className="best-sellers-wrapper">
+          <section className="light-section best-sellers-section">
           <div className="section-inner">
             <div className="best-sellers-header">
               <h2 className="section-heading">OUR BEST SELLERS</h2>
@@ -489,9 +497,9 @@ export default function Home() {
             </div>
 
             <div ref={bestSellersRef} className="best-sellers-grid">
-              {BEST_SELLERS.map((item) => (
-                <div key={item.name} className="best-seller-card">
-                  <div className="best-seller-img-wrap">
+              {PRODUCTS_CATALOG.map((item) => (
+                <div key={item.id} className="best-seller-card">
+                  <Link href={`/products/${item.slug}`} className="best-seller-img-wrap">
                     <img
                       src={item.image}
                       alt={item.name}
@@ -499,27 +507,42 @@ export default function Home() {
                       decoding="async"
                       className="best-seller-img"
                     />
-                  </div>
+                  </Link>
                   <div className="best-seller-body">
                     <div className="best-seller-title-row">
-                      <h3 className="best-seller-name">{item.name}</h3>
+                      <Link href={`/products/${item.slug}`} className="best-seller-link">
+                        <h3 className="best-seller-name">{item.name}</h3>
+                      </Link>
                       <span className="best-seller-rating">
                         <FiStar className="rating-star" /> {item.rating}
                       </span>
                     </div>
                     <p className="best-seller-notes">{item.notes}</p>
-                    <p className="best-seller-price">{item.price}</p>
+                    <div className="best-seller-price-row">
+                      <span className="best-seller-price">{formatINR(item.price)}</span>
+                      <span className="best-seller-original">
+                        {formatINR(item.originalPrice)}
+                      </span>
+                      <span className="best-seller-discount">{item.discountLabel}</span>
+                    </div>
                     <div className="best-seller-sizes">
                       <span className="size-pill">50ml</span>
                       <span className="size-pill is-active">100ml</span>
                       <span className="size-pill">Personalized</span>
                     </div>
-                    <button type="button" className="quick-add-btn">
+                    <button
+                      type="button"
+                      className="quick-add-btn"
+                      onClick={() => {
+                        addToCart(item, "100ml", 1);
+                        setCartOpen(true);
+                      }}
+                    >
                       Quick Add
                     </button>
-                    <button type="button" className="buy-now-btn">
+                    <Link href={`/products/${item.slug}`} className="buy-now-btn pd-card-link-btn">
                       Buy Now
-                    </button>
+                    </Link>
                   </div>
                 </div>
               ))}
@@ -551,6 +574,7 @@ export default function Home() {
             </div>
           </div>
         </section>
+        </div>
 
         {/* From The Journal */}
         <section className="light-section journal-section">
